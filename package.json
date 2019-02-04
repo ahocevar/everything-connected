@@ -14,6 +14,7 @@
     "start": "parcel watch -d client client-src/index.html client-src/nutzungsstreifen.html client-src/segment.html & node index.js"
   },
   "devDependencies": {
+    "broadcast-channel": "^2.1.9",
     "parcel-bundler": "^1.11.0",
     "socket.io-client": "^2.2.0"
   }

@@ -18,12 +18,6 @@ app.use('/features', function(request, response) {
 
 app.use(static('client'));
 
-io.on('connection', function (socket) {
-  socket.on('change:edgeid', function (edgeid) {
-    io.emit('change:edgeid', edgeid);
-  });
-});
-
 http.listen(port, function () {
   console.log('listening on *:' + port);
 });

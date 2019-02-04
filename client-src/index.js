@@ -1,5 +1,6 @@
 import 'ol/ol.css';
 import io from 'socket.io-client';
+import BroadcastChannel from 'broadcast-channel';
 import { Map, View, Overlay } from 'ol';
 import { Tile, Vector } from 'ol/layer';
 import { XYZ } from 'ol/source';
@@ -13,6 +14,7 @@ import sync from 'ol-hashed';
 import { isEmpty } from 'ol/obj';
 
 const socket = io();
+const bc = new BroadcastChannel('change-edgeid');
 
 class Format extends GeoJSON {
   readFeaturesFromObject(object, opt_options) {
@@ -91,8 +93,13 @@ map.on(['pointermove', 'click'], function(e) {
     if (clicked) {
       selection.clear();
       const feature = features[0];
-      selection.addFeature(feature);
-      socket.emit('change:edgeid', feature.getId());
+      const edgeid = feature.getId();
+      state.edgeid = edgeid;
+      update({
+        edgeid: edgeid
+      });
+      updateEdge();
+      bc.postMessage(edgeid);
     }
   } else {
     map.getTargetElement().style.cursor = '';
@@ -103,7 +110,7 @@ map.on(['pointermove', 'click'], function(e) {
   }
 });
 
-socket.on('change:edgeid', function(edgeid) {
+bc.addEventListener('message', function(edgeid) {
   state.edgeid = edgeid;
   update({
     edgeid: edgeid

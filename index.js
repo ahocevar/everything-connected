@@ -1,18 +1,29 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
+const app = require('express')();
+const static = require('express').static;
+const Server = require('http').Server;
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+const http = new Server(app);
+const io = require('socket.io')(http);
+const makeCrud = require('express-json-file-crud').makeCrud;
+
+const port = process.env.PORT || 3000;
+
+const features = makeCrud('features', './storage');
+app.use('/features', function(request, response) {
+  features(request, response);
+  if (request.method === 'PUT') {
+    io.emit('change:features', request.url.substr(1));
+  }
 });
 
-io.on('connection', function(socket){
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+app.use(static('client'));
+
+io.on('connection', function (socket) {
+  socket.on('change:edgeid', function (edgeid) {
+    io.emit('change:edgeid', edgeid);
   });
 });
 
-http.listen(port, function(){
+http.listen(port, function () {
   console.log('listening on *:' + port);
 });

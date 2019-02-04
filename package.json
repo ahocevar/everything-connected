@@ -11,6 +11,7 @@
     "socket.io": "^1.7.3"
   },
   "scripts": {
+    "postinstall": "npx parcel build -d client client-src/index.html client-src/nutzungsstreifen.html client-src/segment.html",
     "start": "npx parcel watch -d client client-src/index.html client-src/nutzungsstreifen.html client-src/segment.html & node index.js"
   },
   "devDependencies": {
